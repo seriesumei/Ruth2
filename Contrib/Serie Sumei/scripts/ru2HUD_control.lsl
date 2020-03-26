@@ -21,7 +21,8 @@
 // ss-o 15Mar2020 <seriesumei@avimail.org> - Add ankle lock
 // ss-p 20Mar2020 <seriesumei@avimail.org> - Add foot poses
 // ss-q 21Mar2020 <seriesumei@avimail.org> - Add skin panel
-// ss-r 24Mar2020 <seriesumei@avimail.org> - Rework doll datastructures
+// ss-r 25Mar2020 <seriesumei@avimail.org> - Rework doll datastructures
+// ss-s 26Mar2020 <seriesumei@avimail.org> - Simple alpha HUD
 
 // This is a heavily modified version of Shin's RC3 HUD scripts for alpha
 // and skin selections.
@@ -80,7 +81,7 @@ vector ALPHA_HUD = <-PI_BY_TWO, 0.0, 0.0>;
 vector alpha_rot;
 vector last_rot;
 
-integer VERBOSE = FALSE;
+integer VERBOSE = TRUE;
 
 // Memory limit
 integer MEM_LIMIT = 64000;
@@ -578,65 +579,35 @@ default {
                 llRequestPermissions(llDetectedKey(0), PERMISSION_ATTACH);
             }
         }
-        else if (name == "buttonbar1" || name == "buttonbar5") {
+        else if (name == "alpha0") {
             list buttonList = [
-                    "reset",
-                    "chest",
-                    "breasts",
-                    "nipples",
-                    "belly",
-                    "backupper",
-                    "backlower",
-                    "armsupper"
-                    ];
-            if(face == 0) {
+                "head",
+                "chest",
+                "breasts",
+                "belly",
+                "armsupper",
+                "armslower",
+                "hands",
+                "fingernails"
+            ];
+            set_alpha_group(buttonList, link, face);
+        }
+        else if (name == "alpha1") {
+            list buttonList = [
+                "backupper",
+                "backlower",
+                "pelvis",
+                "legsupper",
+                "legslower",
+                "feet",
+                "toenails",
+                "reset"
+            ];
+            if(face == 7) {
                 reset_alpha();
             } else {
                 set_alpha_group(buttonList, link, face);
             }
-        }
-        else if (name == "buttonbar2" || name == "buttonbar6") {
-            list buttonList = [
-                    "armslower",
-                    "armsfull",
-                    "hands",
-                    "crotch",
-                    "pelvis",
-                    "legsupper",
-                    "knees",
-                    "legslower"
-                    ];
-            set_alpha_group(buttonList, link, face);
-        }
-        else if (name == "buttonbar3" || name == "buttonbar7") {
-            list buttonList = [
-                    "legsfull",
-                    "feet",
-                    "ankles",
-                    "heels",
-                    "bridges",
-                    "toecleavages",
-                    "toes",
-                    "soles"
-                    ];
-            set_alpha_group(buttonList, link, face);
-        }
-        else if (name == "buttonbar4" || name == "buttonbar8") {
-            list buttonList = [
-                    "--",
-                    "--",
-                    "--",
-                    "--",
-                    "--",
-                    "--",
-                    "savealpha",
-                    "loadalpha"
-                    ];
-            string commandButton = llList2String(buttonList,face);
-            llOwnerSay("Saving and loading alpha is not yet implemented!");
-        }
-        else if (name == "backboard") {
-            // ignore click on backboard
         }
         else if (name == "bom0") {
             // Bakes on Mesh
