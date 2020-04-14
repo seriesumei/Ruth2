@@ -5,7 +5,7 @@
 
 // v3.0 02Apr2020 <seriesumei@avimail.org> - Based on ss-v5 from Controb/Serie Sumei
 // v3.1 04Apr2020 <seriesumei@avimail.org> - Add alphamode and elements to v2 API
-// v3.2 12Apr2020 <seriesumei@avimail.org> - Use notecard element map for skins
+// v3.2 13Apr2020 <seriesumei@avimail.org> - Use notecard element map for skins, alpha
 
 // This is a heavily modified version of Shin's RC3 receiver scripts for
 // head, body, hands and feet combined into one.
@@ -251,6 +251,7 @@ read_config(string data) {
 }
 
 // ALPHA,<target>,<face>,<alpha>
+// <target> may be a region/group name, a link name or "ALL"
 do_alpha(list args) {
     if (llGetListLength(args) > 3) {
         string target = llStringTrim(llToUpper(llList2String(args, 1)), STRING_TRIM);
@@ -259,7 +260,32 @@ do_alpha(list args) {
         integer link = llListFindList(prim_map, [target]);
         integer found = FALSE;
 
-        if (target == "ALL") {
+        // Look for target in the region/group list
+        integer region = llListFindList(regions, [llToUpper(target)]);
+        if (region >= 0) {
+            // Put a texture on faces belonging to a group
+            list e3 = llList2ListStrided(llDeleteSubList(element_map, 0, 2), 0, -1, element_stride);
+            integer len = llGetListLength(e3);
+            integer i;
+            for (; i < len; ++i) {
+                // Look for matching groups in the element map
+                if (llList2Integer(e3, i) == region) {
+                    link = llListFindList(prim_map, [llList2String(element_map, i * element_stride)]);
+                    if (link >= 0) {
+                        llSetLinkAlpha(
+                            link,
+                            alpha,
+                            llList2Integer(element_map, (i * element_stride) + 1)
+                        );
+                    }
+                }
+            }
+        }
+        else if (link >= 0) {
+            // Target is a prim name
+            llSetLinkAlpha(link, alpha, face);
+        }
+        else if (target == "ALL") {
             // Set entire linkset
             integer i;
             integer len = llGetListLength(prim_map);
@@ -267,10 +293,6 @@ do_alpha(list args) {
             for (; i < len; ++i) {
                 llSetLinkAlpha(i, alpha, face);
             }
-        }
-        else if (link > -1) {
-            // Found a matching part name, use it
-            llSetLinkAlpha(link, alpha, face);
         }
     }
 }
